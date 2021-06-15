@@ -1,4 +1,4 @@
-package com.example.diffutilrv.ui
+package com.example.diffutilrv.ui.employee
 
 import android.os.Bundle
 import android.view.Menu
@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.diffutilrv.R
 import com.example.diffutilrv.databinding.ActivityEmployeeBinding
 import com.example.diffutilrv.uistate.UiState
-import com.example.diffutilrv.viewmodel.EmployeeViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EmployeeActivity : AppCompatActivity() {
@@ -26,8 +25,8 @@ class EmployeeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityEmployeeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setUpUi()
-        setUpViewModel()
+        setupUi()
+        setupViewModel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -49,21 +48,29 @@ class EmployeeActivity : AppCompatActivity() {
         }
     }
 
-    private fun setUpUi() {
+    private fun setupUi() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
     }
 
-    private fun setUpViewModel() {
+    private fun setupViewModel() {
         viewModel.employeeList.observe(this, Observer { uiState ->
             when (uiState) {
-                is UiState.ShowLoading -> binding.progressBar.isVisible = true
-                is UiState.HideLoading -> binding.progressBar.isInvisible = true
-                is UiState.Success -> adapter.submitList(uiState.data)
-                is UiState.Empty -> Toast.makeText(this, "尚無資料", Toast.LENGTH_SHORT).show()
-                is UiState.Error -> Toast.makeText(this, "資料錯誤", Toast.LENGTH_SHORT).show()
+                is UiState.Loading -> binding.progressBar.isVisible = true
+                is UiState.Success -> {
+                    binding.progressBar.isInvisible = true
+                    val list = uiState.data
+                    if (list.isEmpty()) {
+                        Toast.makeText(this, "暫無資料", Toast.LENGTH_SHORT).show()
+                    } else {
+                        adapter.submitList(uiState.data)
+                    }
+                }
+                is UiState.Failure -> {
+                    binding.progressBar.isInvisible = true
+                    Toast.makeText(this, "資料錯誤", Toast.LENGTH_SHORT).show()
+                }
             }
         })
-        viewModel.fetchEmployeeListByName()
     }
 }

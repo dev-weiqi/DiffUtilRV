@@ -1,4 +1,4 @@
-package com.example.diffutilrv.model
+package com.example.diffutilrv.ui.employee.model
 
 data class Employee(
     val id: Int,

@@ -1,42 +1,30 @@
-package com.example.diffutilrv.ui
+package com.example.diffutilrv.ui.employee
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.diffutilrv.R
 import com.example.diffutilrv.databinding.ItemEmployeeBinding
-import com.example.diffutilrv.model.Employee
+import com.example.diffutilrv.ui.employee.model.Employee
 
 class EmployeeAdapter :
     ListAdapter<Employee, EmployeeAdapter.EmployeeViewHolder>(EmployeeDiffItemCallback()) {
-
-    private var itemList: List<Employee> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmployeeViewHolder {
         return EmployeeViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: EmployeeViewHolder, position: Int) {
-        holder.bind(itemList[position])
+        holder.bind(getItem(position))
     }
 
     override fun onViewRecycled(holder: EmployeeViewHolder) {
         holder.unbind()
     }
 
-    override fun submitList(list: List<Employee>?) {
-        super.submitList(list)
-        itemList = list ?: emptyList()
-    }
-
-    override fun getItemCount(): Int = itemList.count()
-
-    class EmployeeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private val binding = ItemEmployeeBinding.bind(itemView)
+    class EmployeeViewHolder(private val binding: ItemEmployeeBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(employee: Employee) {
             binding.employeeName.text = employee.name
@@ -44,16 +32,16 @@ class EmployeeAdapter :
         }
 
         fun unbind() {
-            binding.employeeName.text = null
-            binding.employeeRole.text = null
         }
 
         companion object {
             fun create(parent: ViewGroup): EmployeeViewHolder {
-                val view = LayoutInflater
-                    .from(parent.context)
-                    .inflate(R.layout.item_employee, parent, false)
-                return EmployeeViewHolder(view)
+                return EmployeeViewHolder(
+                    ItemEmployeeBinding.inflate(
+                        LayoutInflater
+                            .from(parent.context), parent, false
+                    )
+                )
             }
         }
     }
